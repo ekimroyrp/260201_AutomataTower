@@ -6,6 +6,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const QUALITY_SCALE = 1.6;
 const FXAA_SCALE = 5.0;
@@ -25,7 +26,7 @@ const settings = {
   gridZ: 22,
   generations: 200,
   baseColor: '#ff6b4a',
-  emissiveStrength: 0.55,
+  emissiveStrength: 0,
   bloom: 0,
 };
 
@@ -66,6 +67,11 @@ renderer.toneMappingExposure = 1.05;
 app.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
+const environment = new RoomEnvironment();
+scene.environment = pmremGenerator.fromScene(environment, 0.04).texture;
+environment.dispose();
+pmremGenerator.dispose();
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60);
 camera.position.set(0, 0.15, 5.6);
@@ -82,14 +88,14 @@ controls.mouseButtons = {
 };
 controls.update();
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.28);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
 scene.add(ambientLight);
 
-const keyLight = new THREE.DirectionalLight(0xffd5c0, 1.0);
+const keyLight = new THREE.DirectionalLight(0xffd5c0, 1.2);
 keyLight.position.set(3.5, 4.2, 2.4);
 scene.add(keyLight);
 
-const rimLight = new THREE.DirectionalLight(0x83b8ff, 0.5);
+const rimLight = new THREE.DirectionalLight(0x83b8ff, 0.7);
 rimLight.position.set(-3.2, 1.8, -3.6);
 scene.add(rimLight);
 
@@ -109,10 +115,12 @@ composer.addPass(fxaaPass);
 const voxelGroup = new THREE.Group();
 scene.add(voxelGroup);
 
-const material = new THREE.MeshStandardMaterial({
+const material = new THREE.MeshPhysicalMaterial({
   color: new THREE.Color(0xffffff),
-  roughness: 0.35,
-  metalness: 0.05,
+  roughness: 0.22,
+  metalness: 0.08,
+  clearcoat: 0.7,
+  clearcoatRoughness: 0.12,
   emissive: new THREE.Color(settings.baseColor),
   emissiveIntensity: settings.emissiveStrength,
   vertexColors: true,
