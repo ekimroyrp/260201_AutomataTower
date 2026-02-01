@@ -29,9 +29,9 @@ const settings = {
   gridZ: 22,
   generations: 200,
   baseColor: '#4d52ff',
-  topColor: '#94ff96',
+  topColor: '#ad4500',
   emissiveStrength: 0,
-  bloom: 0,
+  bloom: 0.3,
 };
 
 const rulePresets = {
@@ -92,6 +92,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
 app.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -116,16 +118,52 @@ controls.mouseButtons = {
 };
 controls.update();
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.12);
 scene.add(ambientLight);
 
-const keyLight = new THREE.DirectionalLight(0xffd5c0, 1.2);
-keyLight.position.set(3.5, 4.2, 2.4);
+const keyLight = new THREE.DirectionalLight(0xffe1cc, 3.0);
+keyLight.position.set(8.5, 14.5, 6.5);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 150;
+keyLight.shadow.camera.left = -60;
+keyLight.shadow.camera.right = 60;
+keyLight.shadow.camera.top = 60;
+keyLight.shadow.camera.bottom = -60;
+keyLight.shadow.bias = 0.0006;
+keyLight.shadow.normalBias = 0.02;
 scene.add(keyLight);
 
-const rimLight = new THREE.DirectionalLight(0x83b8ff, 0.7);
+const rimLight = new THREE.DirectionalLight(0x7fb2ff, 0.35);
 rimLight.position.set(-3.2, 1.8, -3.6);
 scene.add(rimLight);
+
+const fillLight = new THREE.DirectionalLight(0xfff1e1, 0.2);
+fillLight.position.set(-2.5, 3.2, 4.6);
+scene.add(fillLight);
+
+const sunLight = new THREE.DirectionalLight(0xfff4d9, 2.2);
+sunLight.position.set(-12, 18, 10);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(1024, 1024);
+sunLight.shadow.camera.near = 0.5;
+sunLight.shadow.camera.far = 150;
+sunLight.shadow.camera.left = -80;
+sunLight.shadow.camera.right = 80;
+sunLight.shadow.camera.top = 80;
+sunLight.shadow.camera.bottom = -80;
+sunLight.shadow.bias = 0.0008;
+sunLight.shadow.normalBias = 0.02;
+scene.add(sunLight);
+
+const shadowPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(200, 200),
+  new THREE.ShadowMaterial({ opacity: 0.35 })
+);
+shadowPlane.rotation.x = -Math.PI / 2;
+shadowPlane.receiveShadow = true;
+scene.add(shadowPlane);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
@@ -152,7 +190,7 @@ const material = new THREE.MeshPhysicalMaterial({
   emissive: new THREE.Color(0x000000),
   emissiveIntensity: settings.emissiveStrength,
   vertexColors: true,
-  envMapIntensity: 0.6,
+  envMapIntensity: 0.3,
 });
 
 let voxelMesh = null;
@@ -258,6 +296,8 @@ function buildVoxelMesh() {
   instanceColorAttribute = new THREE.InstancedBufferAttribute(new Float32Array(instanceCapacity * 3), 3);
   instanceColorAttribute.setUsage(THREE.DynamicDrawUsage);
   voxelMesh.geometry.setAttribute('color', instanceColorAttribute);
+  voxelMesh.castShadow = true;
+  voxelMesh.receiveShadow = true;
   material.vertexColors = true;
   material.needsUpdate = true;
   voxelMesh.frustumCulled = false;
@@ -456,6 +496,8 @@ function updateVoxelInstances() {
   voxelMesh.count = instanceIndex;
   voxelMesh.instanceMatrix.needsUpdate = true;
   instanceColorAttribute.needsUpdate = true;
+
+  shadowPlane.position.y = -settings.voxelSize * 0.55;
 }
 
 function updateMaterial() {
