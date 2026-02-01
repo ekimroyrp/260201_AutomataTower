@@ -24,6 +24,7 @@ const settings = {
   rule: 'B3/S23',
   ecaRule: 30,
   ecaStart: 'single',
+  orientation: 'vertical',
   voxelSize: 0.14,
   gridX: 22,
   gridZ: 22,
@@ -209,6 +210,7 @@ const tempPos = new THREE.Vector3();
 const tempScale = new THREE.Vector3();
 const tempQuat = new THREE.Quaternion();
 const tempColor = new THREE.Color();
+const orientationQuat = new THREE.Quaternion();
 
 function mulberry32(seed) {
   let t = seed >>> 0;
@@ -458,6 +460,8 @@ function updateVoxelInstances() {
     return;
   }
 
+  updateOrientation();
+
   const scaleValue = settings.voxelSize;
   tempScale.set(scaleValue, scaleValue, scaleValue);
   const baseX = -(gridWidth - 1) * settings.voxelSize * 0.5;
@@ -505,6 +509,17 @@ function updateMaterial() {
   material.emissive.set(settings.baseColor);
   material.emissiveIntensity = settings.emissiveStrength;
   updateVoxelInstances();
+}
+
+function updateOrientation() {
+  if (!voxelGroup) {
+    return;
+  }
+  if (settings.orientation === 'horizontal') {
+    voxelGroup.setRotationFromQuaternion(orientationQuat.setFromEuler(new THREE.Euler(0, 0, Math.PI / 2)));
+  } else {
+    voxelGroup.setRotationFromQuaternion(orientationQuat.identity());
+  }
 }
 
 let isPlaying = false;
@@ -614,6 +629,7 @@ const ecaPresetSelect = document.getElementById('eca-preset');
 const ecaRuleRange = document.getElementById('eca-rule');
 const ecaRuleValue = document.getElementById('eca-rule-value');
 const ecaStartSelect = document.getElementById('eca-start');
+const orientationSelect = document.getElementById('orientation');
 
 function syncRuleDisplay(value) {
   const normalized = updateRuleMasks(value);
@@ -649,6 +665,13 @@ if (ruleModeSelect) {
     settings.ruleMode = ruleModeSelect.value;
     updateRuleModeUI();
     resetSimulation();
+  });
+}
+
+if (orientationSelect) {
+  orientationSelect.addEventListener('change', () => {
+    settings.orientation = orientationSelect.value;
+    updateOrientation();
   });
 }
 
@@ -857,6 +880,9 @@ uiHandleBottom.addEventListener('pointercancel', endDrag);
 
 if (ruleModeSelect) {
   ruleModeSelect.value = settings.ruleMode;
+}
+if (orientationSelect) {
+  orientationSelect.value = settings.orientation;
 }
 updateRuleModeUI();
 setEcaRule(settings.ecaRule);
