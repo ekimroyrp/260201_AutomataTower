@@ -26,6 +26,7 @@ const settings = {
   gridZ: 22,
   generations: 200,
   baseColor: '#ff6b4a',
+  topColor: '#ffb992',
   emissiveStrength: 0,
   bloom: 0,
 };
@@ -116,18 +117,21 @@ const voxelGroup = new THREE.Group();
 scene.add(voxelGroup);
 
 const material = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color(settings.baseColor),
-  roughness: 0.22,
-  metalness: 0.08,
-  clearcoat: 0.7,
-  clearcoatRoughness: 0.12,
-  emissive: new THREE.Color(settings.baseColor),
+  color: new THREE.Color(0xffffff),
+  roughness: 0.28,
+  metalness: 0.0,
+  clearcoat: 0.85,
+  clearcoatRoughness: 0.1,
+  emissive: new THREE.Color(0x000000),
   emissiveIntensity: settings.emissiveStrength,
+  vertexColors: true,
+  envMapIntensity: 0.6,
 });
 
 let voxelMesh = null;
 let voxelGeometry = null;
 let instanceCapacity = 0;
+let instanceColorAttribute = null;
 let gridWidth = settings.gridX;
 let gridDepth = settings.gridZ;
 let maxGenerations = settings.generations;
@@ -199,8 +203,6 @@ function updateRuleMasks(ruleValue) {
   return normalized;
 }
 
-function updateLayerColors() {}
-
 function clampInstanceBudget() {
   const requested = settings.gridX * settings.gridZ * settings.generations;
   if (requested <= MAX_INSTANCES) {
@@ -226,6 +228,11 @@ function buildVoxelMesh() {
   voxelGeometry = new RoundedBoxGeometry(1, 1, 1, BEVEL_SEGMENTS, BEVEL_RADIUS);
   voxelMesh = new THREE.InstancedMesh(voxelGeometry, material, instanceCapacity);
   voxelMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  instanceColorAttribute = new THREE.InstancedBufferAttribute(new Float32Array(instanceCapacity * 3), 3);
+  instanceColorAttribute.setUsage(THREE.DynamicDrawUsage);
+  voxelMesh.geometry.setAttribute('color', instanceColorAttribute);
+  material.vertexColors = true;
+  material.needsUpdate = true;
   voxelMesh.frustumCulled = false;
   voxelGroup.add(voxelMesh);
 }
@@ -306,7 +313,7 @@ function stepSimulation() {
 }
 
 function updateVoxelInstances() {
-  if (!voxelMesh) {
+  if (!voxelMesh || !instanceColorAttribute) {
     return;
   }
 
@@ -315,11 +322,16 @@ function updateVoxelInstances() {
   const baseX = -(gridWidth - 1) * settings.voxelSize * 0.5;
   const baseZ = -(gridDepth - 1) * settings.voxelSize * 0.5;
   const baseY = 0;
+  const baseColor = new THREE.Color(settings.baseColor).convertSRGBToLinear();
+  const topColor = new THREE.Color(settings.topColor).convertSRGBToLinear();
+  const layerSpan = Math.max(layers.length - 1, 1);
 
   let instanceIndex = 0;
 
   for (let layerIndex = 0; layerIndex < layers.length; layerIndex += 1) {
     const layer = layers[layerIndex];
+    const t = layerIndex / layerSpan;
+    tempColor.copy(baseColor).lerp(topColor, t);
     for (let z = 0; z < gridDepth; z += 1) {
       for (let x = 0; x < gridWidth; x += 1) {
         const idx = x + z * gridWidth;
@@ -331,6 +343,10 @@ function updateVoxelInstances() {
         tempPos.set(baseX + x * settings.voxelSize, y, baseZ + z * settings.voxelSize);
         tempMatrix.compose(tempPos, tempQuat, tempScale);
         voxelMesh.setMatrixAt(instanceIndex, tempMatrix);
+        const colorIndex = instanceIndex * 3;
+        instanceColorAttribute.array[colorIndex] = tempColor.r;
+        instanceColorAttribute.array[colorIndex + 1] = tempColor.g;
+        instanceColorAttribute.array[colorIndex + 2] = tempColor.b;
         instanceIndex += 1;
       }
     }
@@ -338,10 +354,11 @@ function updateVoxelInstances() {
 
   voxelMesh.count = instanceIndex;
   voxelMesh.instanceMatrix.needsUpdate = true;
+  instanceColorAttribute.needsUpdate = true;
 }
 
 function updateMaterial() {
-  material.color.set(settings.baseColor);
+  material.color.set(0xffffff);
   material.emissive.set(settings.baseColor);
   material.emissiveIntensity = settings.emissiveStrength;
   updateVoxelInstances();
@@ -518,6 +535,11 @@ bindRange('emissive-strength', 'emissive-strength-value', (v) => v.toFixed(2), (
 bindColor('base-color', 'base-color-value', 'base-color-chip', (value) => {
   settings.baseColor = value;
   updateMaterial();
+});
+
+bindColor('top-color', 'top-color-value', 'top-color-chip', (value) => {
+  settings.topColor = value;
+  updateVoxelInstances();
 });
 
 const playToggle = document.getElementById('play-toggle');
