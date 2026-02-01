@@ -163,11 +163,12 @@ canvas {
   text-transform: uppercase;
   color: var(--accent);
   margin: 4px 0 10px;
-  background: none;
+  background: rgba(255, 255, 255, 0.08);
   border: none;
-  padding: 0;
+  padding: 6px 10px;
   cursor: pointer;
   text-align: left;
+  border-radius: 8px;
 }
 
 .panel-heading:focus-visible {
