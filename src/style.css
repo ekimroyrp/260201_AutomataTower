@@ -259,7 +259,7 @@ canvas {
 }
 
 .switch input:checked + .slider {
-  background: linear-gradient(135deg, #ff7b5d, #ffcf77);
+  background: linear-gradient(135deg, #35d27d, #98f7b4);
 }
 
 .switch input:checked + .slider::before {
@@ -275,8 +275,8 @@ input[type="range"] {
   border-radius: 999px;
   background: linear-gradient(
       90deg,
-      #ff7b5d 0%,
-      #ffcf77 var(--range-progress, 50%),
+      #35d27d 0%,
+      #98f7b4 var(--range-progress, 50%),
       rgba(255, 255, 255, 0.12) var(--range-progress, 50%),
       rgba(255, 255, 255, 0.12) 100%
     );
@@ -421,7 +421,7 @@ input[type="range"]::-moz-range-track {
 }
 
 .pill-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #ff7b5d, #ffcf77);
+  background: linear-gradient(135deg, #35d27d, #98f7b4);
   color: #1b1b1b;
   transform: translateY(-1px);
 }
@@ -431,12 +431,12 @@ input[type="range"]::-moz-range-track {
 }
 
 .pill-button.is-paused {
-  background: linear-gradient(135deg, #ff7b5d, #ffcf77);
+  background: linear-gradient(135deg, #35d27d, #98f7b4);
   color: #1b1b1b;
 }
 
 .pill-button.is-paused:hover {
-  background: linear-gradient(135deg, #ff7b5d, #ffcf77);
+  background: linear-gradient(135deg, #35d27d, #98f7b4);
   color: #1b1b1b;
 }
 
