@@ -153,11 +153,45 @@ canvas {
 }
 
 .panel-heading {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
   margin: 4px 0 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.panel-heading:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.panel-chevron {
+  font-size: 12px;
+  transform: rotate(180deg);
+  transition: transform 160ms ease;
+}
+
+.panel-section.is-collapsed .panel-content {
+  display: none;
+}
+
+.panel-section.is-collapsed .panel-chevron {
+  transform: rotate(0deg);
+}
+
+.panel-section.is-collapsed .panel-heading {
+  margin-bottom: 0;
 }
 
 .control {

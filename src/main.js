@@ -25,8 +25,8 @@ const settings = {
   gridX: 22,
   gridZ: 22,
   generations: 200,
-  baseColor: '#ff6b4a',
-  topColor: '#ffb992',
+  baseColor: '#4d52ff',
+  topColor: '#94ff96',
   emissiveStrength: 0,
   bloom: 0,
 };
@@ -566,6 +566,7 @@ const uiHandle = document.getElementById('ui-handle');
 const uiHandleBottom = document.getElementById('ui-handle-bottom');
 const collapseToggle = document.getElementById('collapse-toggle');
 let dragOffset = null;
+const sectionHeadings = document.querySelectorAll('.panel-section .panel-heading');
 
 function clampPanelToViewport() {
   const margin = 10;
@@ -585,6 +586,17 @@ collapseToggle.addEventListener('pointerdown', (event) => {
 collapseToggle.addEventListener('click', () => {
   const collapsed = uiPanel.classList.toggle('is-collapsed');
   collapseToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+});
+
+sectionHeadings.forEach((heading) => {
+  heading.addEventListener('click', () => {
+    const section = heading.closest('.panel-section');
+    if (!section) {
+      return;
+    }
+    const collapsed = section.classList.toggle('is-collapsed');
+    heading.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  });
 });
 
 function startDrag(event) {

@@ -16,151 +16,167 @@
       </div>
       <div class="ui-body">
         <div class="panel-section">
-          <div class="panel-heading">Simulation</div>
-          <label class="control">
-            <div class="control-row">
-              <span>Speed</span>
-            <span id="sim-speed-value">8.00</span>
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Simulation</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Speed</span>
+                <span id="sim-speed-value">8.00</span>
+              </div>
+              <input type="range" id="sim-speed" min="0" max="12" step="0.1" value="8" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Generations</span>
+                <span id="grid-y-value">200</span>
+              </div>
+              <input type="range" id="grid-y" min="4" max="500" step="1" value="200" />
+            </label>
+            <div class="control">
+              <button type="button" id="play-toggle" class="pill-button">Play</button>
+            </div>
+            <div class="control">
+              <button type="button" id="step-once" class="pill-button">Step</button>
+            </div>
+            <div class="control">
+              <button type="button" id="reset-sim" class="pill-button">Reset</button>
+            </div>
           </div>
-            <input type="range" id="sim-speed" min="0" max="12" step="0.1" value="8" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Density</span>
-              <span id="sim-density-value">0.35</span>
-            </div>
-            <input type="range" id="sim-density" min="0" max="1" step="0.01" value="0.35" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Seed</span>
-              <span id="sim-seed-value">42</span>
-            </div>
-            <input type="range" id="sim-seed" min="0" max="1000" step="1" value="42" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Wrap Edges</span>
-              <label class="switch">
-                <input type="checkbox" id="wrap-toggle" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Neighbor Mode</span>
-              <select id="neighbor-mode" class="select-input">
-                <option value="moore" selected>Moore (8)</option>
-                <option value="vonneumann">Von Neumann (4)</option>
-              </select>
-            </div>
-          </label>
         </div>
 
         <div class="panel-section">
-          <div class="panel-heading">Rules</div>
-          <label class="control">
-            <div class="control-row">
-              <span>Preset</span>
-              <select id="rule-preset" class="select-input">
-                <option value="b3s23" selected>Conway (B3/S23)</option>
-                <option value="b36s23">HighLife (B36/S23)</option>
-                <option value="b2s">Seeds (B2/S)</option>
-                <option value="b3678s34678">Day & Night (B3678/S34678)</option>
-                <option value="custom">Custom</option>
-              </select>
-            </div>
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Custom Rule</span>
-              <span id="rule-value" class="mono-text">B3/S23</span>
-            </div>
-            <input type="text" id="rule-input" class="text-input" value="B3/S23" />
-          </label>
-        </div>
-
-        <div class="panel-section">
-          <div class="panel-heading">Grid</div>
-          <label class="control">
-            <div class="control-row">
-              <span>Voxel Size</span>
-              <span id="voxel-size-value">0.14</span>
-            </div>
-            <input type="range" id="voxel-size" min="0.06" max="0.35" step="0.01" value="0.14" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Grid X</span>
-              <span id="grid-x-value">22</span>
-            </div>
-            <input type="range" id="grid-x" min="8" max="64" step="1" value="22" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Grid Z</span>
-              <span id="grid-z-value">22</span>
-            </div>
-            <input type="range" id="grid-z" min="8" max="64" step="1" value="22" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Generations</span>
-              <span id="grid-y-value">200</span>
-            </div>
-            <input type="range" id="grid-y" min="4" max="200" step="1" value="200" />
-          </label>
-        </div>
-
-        <div class="panel-section">
-          <div class="panel-heading">Rendering</div>
-          <label class="control">
-            <div class="control-row">
-              <span>Bloom</span>
-              <span id="bloom-strength-value">0.00</span>
-            </div>
-            <input type="range" id="bloom-strength" min="0" max="2" step="0.05" value="0" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Emissive</span>
-              <span id="emissive-strength-value">0.00</span>
-            </div>
-            <input type="range" id="emissive-strength" min="0" max="2" step="0.05" value="0" />
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Top Color</span>
-              <span id="top-color-value" class="color-hex">#ffb992</span>
-            </div>
-            <div class="color-picker-row">
-              <button type="button" id="top-color-chip" aria-label="Pick top color"></button>
-              <input type="color" id="top-color" value="#ffb992" />
-            </div>
-          </label>
-          <label class="control">
-            <div class="control-row">
-              <span>Base Color</span>
-              <span id="base-color-value" class="color-hex">#ff6b4a</span>
-            </div>
-            <div class="color-picker-row">
-              <button type="button" id="base-color-chip" aria-label="Pick base color"></button>
-              <input type="color" id="base-color" value="#ff6b4a" />
-            </div>
-          </label>
-        </div>
-
-        <div class="panel-section">
-          <div class="panel-heading">Actions</div>
-          <div class="control">
-            <button type="button" id="play-toggle" class="pill-button">Pause</button>
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Rules</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Mode</span>
+                <select id="neighbor-mode" class="select-input">
+                  <option value="moore" selected>Moore (8)</option>
+                  <option value="vonneumann">Von Neumann (4)</option>
+                </select>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Rule</span>
+                <select id="rule-preset" class="select-input">
+                  <option value="b3s23" selected>Conway (B3/S23)</option>
+                  <option value="b36s23">HighLife (B36/S23)</option>
+                  <option value="b2s">Seeds (B2/S)</option>
+                  <option value="b3678s34678">Day & Night (B3678/S34678)</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Custom Rule</span>
+                <span id="rule-value" class="mono-text">B3/S23</span>
+              </div>
+              <input type="text" id="rule-input" class="text-input" value="B3/S23" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Wrap Edges</span>
+                <label class="switch">
+                  <input type="checkbox" id="wrap-toggle" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </label>
           </div>
-          <div class="control">
-            <button type="button" id="step-once" class="pill-button">Step Once</button>
+        </div>
+
+        <div class="panel-section">
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Grid</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Voxel Size</span>
+                <span id="voxel-size-value">0.14</span>
+              </div>
+              <input type="range" id="voxel-size" min="0.06" max="0.35" step="0.01" value="0.14" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Voxels X</span>
+                <span id="grid-x-value">22</span>
+              </div>
+              <input type="range" id="grid-x" min="8" max="64" step="1" value="22" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Voxels Y</span>
+                <span id="grid-z-value">22</span>
+              </div>
+              <input type="range" id="grid-z" min="8" max="64" step="1" value="22" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Density</span>
+                <span id="sim-density-value">0.35</span>
+              </div>
+              <input type="range" id="sim-density" min="0" max="1" step="0.01" value="0.35" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Seed</span>
+                <span id="sim-seed-value">42</span>
+              </div>
+              <input type="range" id="sim-seed" min="0" max="1000" step="1" value="42" />
+            </label>
           </div>
-          <div class="control">
-            <button type="button" id="reset-sim" class="pill-button">Reset + Reseed</button>
+        </div>
+
+        <div class="panel-section">
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Rendering</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Bloom</span>
+                <span id="bloom-strength-value">0.00</span>
+              </div>
+              <input type="range" id="bloom-strength" min="0" max="2" step="0.05" value="0" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Emissive</span>
+                <span id="emissive-strength-value">0.00</span>
+              </div>
+              <input type="range" id="emissive-strength" min="0" max="2" step="0.05" value="0" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Top Color</span>
+                <span id="top-color-value" class="color-hex">#94ff96</span>
+              </div>
+              <div class="color-picker-row">
+                <button type="button" id="top-color-chip" aria-label="Pick top color"></button>
+                <input type="color" id="top-color" value="#94ff96" />
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Base Color</span>
+                <span id="base-color-value" class="color-hex">#4d52ff</span>
+              </div>
+              <div class="color-picker-row">
+                <button type="button" id="base-color-chip" aria-label="Pick base color"></button>
+                <input type="color" id="base-color" value="#4d52ff" />
+              </div>
+            </label>
           </div>
         </div>
       </div>
