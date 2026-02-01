@@ -36,6 +36,20 @@ const rulePresets = {
   b36s23: 'B36/S23',
   b2s: 'B2/S',
   b3678s34678: 'B3678/S34678',
+  morley: 'B368/S245',
+  twox2: 'B36/S125',
+  diamoeba: 'B35678/S5678',
+  anneal: 'B4678/S35678',
+  replicator: 'B1357/S1357',
+  lifewithoutdeath: 'B3/S012345678',
+  coral: 'B3/S45678',
+  maze: 'B3/S12345',
+  mazectric: 'B3/S1234',
+  serviettes: 'B234/S',
+  coagulations: 'B378/S235678',
+  walledcities: 'B45678/S2345',
+  assimilation: 'B345/S4567',
+  stains: 'B3678/S235678',
 };
 
 const neighborOffsets = {
