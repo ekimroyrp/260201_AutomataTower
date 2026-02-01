@@ -1,0 +1,29 @@
+{
+  "name": "260201_automatatower",
+  "version": "0.1.0",
+  "description": "260201_AutomataTower generates 3D cellular automata towers in Three.js with a floating control panel.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekimroyrp/260201_AutomataTower.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekimroyrp/260201_AutomataTower/issues"
+  },
+  "homepage": "https://github.com/ekimroyrp/260201_AutomataTower#readme",
+  "dependencies": {
+    "three": "^0.182.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1",
+    "vite-plugin-glsl": "^1.5.5"
+  }
+}

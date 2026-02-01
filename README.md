@@ -1,15 +1,20 @@
 # 260201_AutomataTower
 
-260201_AutomataTower is the initial home for the AutomataTower project. This repository will hold the source code, assets, and documentation as development progresses.
+260201_AutomataTower is a Three.js cellular automata tower generator that stacks each 2D generation into a glowing voxel column with a draggable control panel.
 
 ## Features
-- Project scaffold and documentation baseline
-- Guardrails for repository workflow
+- Vite + Three.js project scaffold with postprocessing (bloom/FXAA)
+- Instanced voxel renderer for stacked cellular automata generations
+- Floating UI to control grid size, voxel scale, rules, and simulation playback
 
 ## Getting Started
-1. Clone the repository.
-2. Open the folder in your editor of choice.
-3. Follow upcoming setup instructions as code and tooling are added.
+1. Install dependencies: `npm install`
+2. Start the dev server: `npm run dev`
+3. Open the local URL printed by Vite.
 
 ## Controls
-- Not yet defined. Controls will be documented once gameplay is implemented.
+- Speed, density, and seed sliders control simulation pacing and initialization.
+- Rule preset + custom rule input adjust B/S cellular automata rules.
+- Grid X/Z and Generations define the tower footprint and height.
+- Voxel size, bloom, emissive, and base color tune rendering.
+- Play/Pause, Step Once, and Reset + Reseed manage playback.
