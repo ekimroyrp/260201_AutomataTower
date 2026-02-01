@@ -116,14 +116,13 @@ const voxelGroup = new THREE.Group();
 scene.add(voxelGroup);
 
 const material = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color(0xffffff),
+  color: new THREE.Color(settings.baseColor),
   roughness: 0.22,
   metalness: 0.08,
   clearcoat: 0.7,
   clearcoatRoughness: 0.12,
   emissive: new THREE.Color(settings.baseColor),
   emissiveIntensity: settings.emissiveStrength,
-  vertexColors: true,
 });
 
 let voxelMesh = null;
@@ -136,8 +135,6 @@ let currentGrid = null;
 let layers = [];
 let birthMask = new Array(9).fill(false);
 let surviveMask = new Array(9).fill(false);
-let layerColors = [];
-
 const tempMatrix = new THREE.Matrix4();
 const tempPos = new THREE.Vector3();
 const tempScale = new THREE.Vector3();
@@ -202,15 +199,7 @@ function updateRuleMasks(ruleValue) {
   return normalized;
 }
 
-function updateLayerColors() {
-  layerColors = [];
-  const base = new THREE.Color(settings.baseColor);
-  const highlight = base.clone().offsetHSL(0.02, 0.08, 0.18);
-  for (let i = 0; i < maxGenerations; i += 1) {
-    const t = maxGenerations <= 1 ? 0 : i / (maxGenerations - 1);
-    layerColors.push(base.clone().lerp(highlight, t));
-  }
-}
+function updateLayerColors() {}
 
 function clampInstanceBudget() {
   const requested = settings.gridX * settings.gridZ * settings.generations;
@@ -237,7 +226,6 @@ function buildVoxelMesh() {
   voxelGeometry = new RoundedBoxGeometry(1, 1, 1, BEVEL_SEGMENTS, BEVEL_RADIUS);
   voxelMesh = new THREE.InstancedMesh(voxelGeometry, material, instanceCapacity);
   voxelMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  voxelMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(instanceCapacity * 3), 3);
   voxelMesh.frustumCulled = false;
   voxelGroup.add(voxelMesh);
 }
@@ -258,7 +246,6 @@ function resetSimulation() {
   gridDepth = settings.gridZ;
   maxGenerations = settings.generations;
   updateRuleMasks(settings.rule);
-  updateLayerColors();
   seedGrid();
   layers = [currentGrid.slice()];
   stepAccumulator = 0;
@@ -333,8 +320,6 @@ function updateVoxelInstances() {
 
   for (let layerIndex = 0; layerIndex < layers.length; layerIndex += 1) {
     const layer = layers[layerIndex];
-    const layerColor = layerColors[layerIndex] || layerColors[layerColors.length - 1];
-
     for (let z = 0; z < gridDepth; z += 1) {
       for (let x = 0; x < gridWidth; x += 1) {
         const idx = x + z * gridWidth;
@@ -346,7 +331,6 @@ function updateVoxelInstances() {
         tempPos.set(baseX + x * settings.voxelSize, y, baseZ + z * settings.voxelSize);
         tempMatrix.compose(tempPos, tempQuat, tempScale);
         voxelMesh.setMatrixAt(instanceIndex, tempMatrix);
-        voxelMesh.setColorAt(instanceIndex, layerColor);
         instanceIndex += 1;
       }
     }
@@ -354,15 +338,12 @@ function updateVoxelInstances() {
 
   voxelMesh.count = instanceIndex;
   voxelMesh.instanceMatrix.needsUpdate = true;
-  if (voxelMesh.instanceColor) {
-    voxelMesh.instanceColor.needsUpdate = true;
-  }
 }
 
 function updateMaterial() {
+  material.color.set(settings.baseColor);
   material.emissive.set(settings.baseColor);
   material.emissiveIntensity = settings.emissiveStrength;
-  updateLayerColors();
   updateVoxelInstances();
 }
 
