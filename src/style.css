@@ -275,9 +275,9 @@ input[type="range"] {
   border-radius: 999px;
   background: linear-gradient(
       90deg,
-      #35d27d 0%,
-      #98f7b4 var(--range-progress, 50%),
-      rgba(255, 255, 255, 0.12) var(--range-progress, 50%),
+      #35d27d 0px,
+      #98f7b4 var(--range-progress, 50px),
+      rgba(255, 255, 255, 0.12) var(--range-progress, 50px),
       rgba(255, 255, 255, 0.12) 100%
     );
   box-shadow: none;

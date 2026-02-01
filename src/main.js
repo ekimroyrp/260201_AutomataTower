@@ -507,6 +507,7 @@ function handleResize() {
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   clampPanelToViewport();
+  refreshRangeProgress();
 }
 
 window.addEventListener('resize', handleResize);
@@ -516,8 +517,18 @@ function setRangeProgress(range) {
   const min = Number(range.min);
   const max = Number(range.max);
   const value = Number(range.value);
-  const percent = ((value - min) / (max - min)) * 100;
-  range.style.setProperty('--range-progress', `${percent}%`);
+  const percent = (value - min) / (max - min);
+  const thumbSize = 16;
+  const trackWidth = range.clientWidth || 1;
+  const usable = Math.max(trackWidth - thumbSize, 1);
+  const px = percent * usable + thumbSize * 0.5;
+  range.style.setProperty('--range-progress', `${px}px`);
+}
+
+function refreshRangeProgress() {
+  document.querySelectorAll('input[type="range"]').forEach((range) => {
+    setRangeProgress(range);
+  });
 }
 
 function bindRange(rangeId, valueId, formatter, onChange) {
@@ -573,6 +584,9 @@ function updateRuleModeUI() {
     const mode = group.getAttribute('data-rule-mode');
     const isActive = mode === settings.ruleMode;
     group.classList.toggle('is-hidden', !isActive);
+  });
+  requestAnimationFrame(() => {
+    refreshRangeProgress();
   });
 }
 
