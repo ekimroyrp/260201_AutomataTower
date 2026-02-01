@@ -32,7 +32,7 @@ const settings = {
   baseColor: '#4d52ff',
   topColor: '#ad4500',
   emissiveStrength: 0,
-  bloom: 0.3,
+  bloom: 0.1,
 };
 
 const rulePresets = {
@@ -104,13 +104,14 @@ scene.environment = pmremGenerator.fromScene(environment, 0.04).texture;
 environment.dispose();
 pmremGenerator.dispose();
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 400);
 camera.position.set(0, 0.15, 5.6);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = true;
 controls.enableZoom = true;
+controls.maxDistance = 200;
 controls.target.set(0, 0, 0);
 controls.mouseButtons = {
   LEFT: THREE.MOUSE.ROTATE,
