@@ -20,7 +20,10 @@ const settings = {
   seed: 42,
   wrapEdges: true,
   neighborMode: 'moore',
+  ruleMode: 'llr',
   rule: 'B3/S23',
+  ecaRule: 30,
+  ecaStart: 'single',
   voxelSize: 0.14,
   gridX: 22,
   gridZ: 22,
@@ -50,6 +53,16 @@ const rulePresets = {
   walledcities: 'B45678/S2345',
   assimilation: 'B345/S4567',
   stains: 'B3678/S235678',
+};
+
+const ecaPresets = {
+  rule30: 30,
+  rule90: 90,
+  rule110: 110,
+  rule54: 54,
+  rule60: 60,
+  rule22: 22,
+  rule184: 184,
 };
 
 const neighborOffsets = {
@@ -251,7 +264,7 @@ function buildVoxelMesh() {
   voxelGroup.add(voxelMesh);
 }
 
-function seedGrid() {
+function seedLifeLikeGrid() {
   const rand = mulberry32(settings.seed + 1);
   currentGrid = new Uint8Array(gridWidth * gridDepth);
   for (let z = 0; z < gridDepth; z += 1) {
@@ -262,11 +275,39 @@ function seedGrid() {
   }
 }
 
+function seedEcaGrid() {
+  const rand = mulberry32(settings.seed + 1);
+  currentGrid = new Uint8Array(gridWidth * gridDepth);
+  if (settings.ecaStart === 'single') {
+    const center = Math.floor(gridWidth / 2);
+    for (let z = 0; z < gridDepth; z += 1) {
+      currentGrid[center + z * gridWidth] = 1;
+    }
+  } else {
+    for (let z = 0; z < gridDepth; z += 1) {
+      for (let x = 0; x < gridWidth; x += 1) {
+        const idx = x + z * gridWidth;
+        currentGrid[idx] = rand() < settings.density ? 1 : 0;
+      }
+    }
+  }
+}
+
+function seedGrid() {
+  if (settings.ruleMode === 'eca') {
+    seedEcaGrid();
+  } else {
+    seedLifeLikeGrid();
+  }
+}
+
 function resetSimulation() {
   gridWidth = settings.gridX;
   gridDepth = settings.gridZ;
   maxGenerations = settings.generations;
-  updateRuleMasks(settings.rule);
+  if (settings.ruleMode === 'llr') {
+    updateRuleMasks(settings.rule);
+  }
   seedGrid();
   layers = [currentGrid.slice()];
   stepAccumulator = 0;
@@ -303,7 +344,7 @@ function countNeighbors(grid, x, z) {
   return count;
 }
 
-function stepSimulation() {
+function stepLifeLike() {
   const nextGrid = new Uint8Array(gridWidth * gridDepth);
   for (let z = 0; z < gridDepth; z += 1) {
     for (let x = 0; x < gridWidth; x += 1) {
@@ -324,6 +365,52 @@ function stepSimulation() {
     layers.shift();
   }
   updateVoxelInstances();
+}
+
+function stepEca() {
+  const nextGrid = new Uint8Array(gridWidth * gridDepth);
+  for (let z = 0; z < gridDepth; z += 1) {
+    for (let x = 0; x < gridWidth; x += 1) {
+      const leftIndex = x - 1;
+      const rightIndex = x + 1;
+      let left = 0;
+      let right = 0;
+
+      if (settings.wrapEdges) {
+        const lx = (leftIndex + gridWidth) % gridWidth;
+        const rx = (rightIndex + gridWidth) % gridWidth;
+        left = currentGrid[lx + z * gridWidth];
+        right = currentGrid[rx + z * gridWidth];
+      } else {
+        if (leftIndex >= 0) {
+          left = currentGrid[leftIndex + z * gridWidth];
+        }
+        if (rightIndex < gridWidth) {
+          right = currentGrid[rightIndex + z * gridWidth];
+        }
+      }
+
+      const center = currentGrid[x + z * gridWidth];
+      const pattern = (left << 2) | (center << 1) | right;
+      const next = (settings.ecaRule >> pattern) & 1;
+      nextGrid[x + z * gridWidth] = next;
+    }
+  }
+
+  currentGrid = nextGrid;
+  layers.push(nextGrid);
+  if (layers.length > maxGenerations) {
+    layers.shift();
+  }
+  updateVoxelInstances();
+}
+
+function stepSimulation() {
+  if (settings.ruleMode === 'eca') {
+    stepEca();
+  } else {
+    stepLifeLike();
+  }
 }
 
 function updateVoxelInstances() {
@@ -465,14 +552,48 @@ function bindColor(colorId, valueId, chipId, onChange) {
   update();
 }
 
+const ruleModeSelect = document.getElementById('rule-mode');
 const rulePresetSelect = document.getElementById('rule-preset');
 const ruleInput = document.getElementById('rule-input');
 const ruleValue = document.getElementById('rule-value');
+const ruleModeGroups = document.querySelectorAll('[data-rule-mode]');
+const ecaPresetSelect = document.getElementById('eca-preset');
+const ecaRuleRange = document.getElementById('eca-rule');
+const ecaRuleValue = document.getElementById('eca-rule-value');
+const ecaStartSelect = document.getElementById('eca-start');
 
 function syncRuleDisplay(value) {
   const normalized = updateRuleMasks(value);
   ruleValue.textContent = normalized;
   ruleInput.value = normalized;
+}
+
+function updateRuleModeUI() {
+  ruleModeGroups.forEach((group) => {
+    const mode = group.getAttribute('data-rule-mode');
+    const isActive = mode === settings.ruleMode;
+    group.classList.toggle('is-hidden', !isActive);
+  });
+}
+
+function setEcaRule(value) {
+  const nextValue = Math.max(0, Math.min(255, Math.round(value)));
+  settings.ecaRule = nextValue;
+  if (ecaRuleRange) {
+    ecaRuleRange.value = nextValue.toString();
+    setRangeProgress(ecaRuleRange);
+  }
+  if (ecaRuleValue) {
+    ecaRuleValue.textContent = nextValue.toString();
+  }
+}
+
+if (ruleModeSelect) {
+  ruleModeSelect.addEventListener('change', () => {
+    settings.ruleMode = ruleModeSelect.value;
+    updateRuleModeUI();
+    resetSimulation();
+  });
 }
 
 rulePresetSelect.addEventListener('change', () => {
@@ -491,6 +612,35 @@ ruleInput.addEventListener('input', () => {
   const normalized = updateRuleMasks(ruleInput.value);
   ruleValue.textContent = normalized;
 });
+
+if (ecaPresetSelect) {
+  ecaPresetSelect.addEventListener('change', () => {
+    const key = ecaPresetSelect.value;
+    if (key === 'custom') {
+      return;
+    }
+    const preset = ecaPresets[key];
+    if (typeof preset === 'number') {
+      setEcaRule(preset);
+    }
+  });
+}
+
+if (ecaRuleRange) {
+  ecaRuleRange.addEventListener('input', () => {
+    setEcaRule(Number(ecaRuleRange.value));
+    if (ecaPresetSelect) {
+      ecaPresetSelect.value = 'custom';
+    }
+  });
+}
+
+if (ecaStartSelect) {
+  ecaStartSelect.addEventListener('change', () => {
+    settings.ecaStart = ecaStartSelect.value;
+    resetSimulation();
+  });
+}
 
 const neighborSelect = document.getElementById('neighbor-mode');
 neighborSelect.addEventListener('change', () => {
@@ -649,6 +799,11 @@ uiHandleBottom.addEventListener('pointermove', moveDrag);
 uiHandleBottom.addEventListener('pointerup', endDrag);
 uiHandleBottom.addEventListener('pointercancel', endDrag);
 
+if (ruleModeSelect) {
+  ruleModeSelect.value = settings.ruleMode;
+}
+updateRuleModeUI();
+setEcaRule(settings.ecaRule);
 syncRuleDisplay(settings.rule);
 rebuildSimulation();
 clampPanelToViewport();

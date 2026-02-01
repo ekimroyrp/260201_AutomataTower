@@ -195,6 +195,18 @@ canvas {
   margin-bottom: 0;
 }
 
+.rules-group {
+  margin-bottom: 12px;
+}
+
+.rules-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.is-hidden {
+  display: none;
+}
+
 .control {
   display: block;
   width: 100%;
