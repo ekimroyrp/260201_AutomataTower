@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>260201_AutomataTower</title>
+  <script type="module" crossorigin src="./assets/index-CIM5ZLcI.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-uNy8iMLR.css">
+</head>
+<body>
+  <div id="app">
+    <div id="ui-panel">
+      <div id="ui-handle">
+        <button type="button" id="collapse-toggle" class="collapse-button" aria-label="Collapse controls" aria-expanded="true">
+          <span class="collapse-icon">v</span>
+        </button>
+      </div>
+      <div class="ui-body">
+        <div class="panel-section">
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Simulation</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Orientation</span>
+                <select id="orientation" class="select-input">
+                  <option value="vertical" selected>Vertical</option>
+                  <option value="horizontal">Horizontal</option>
+                </select>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Speed</span>
+                <span id="sim-speed-value">8.00</span>
+              </div>
+              <input type="range" id="sim-speed" min="0" max="12" step="0.1" value="8" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Generations</span>
+                <span id="grid-y-value">200</span>
+              </div>
+              <input type="range" id="grid-y" min="1" max="500" step="1" value="200" />
+            </label>
+            <div class="control">
+              <button type="button" id="play-toggle" class="pill-button">Play</button>
+            </div>
+            <div class="control">
+              <button type="button" id="step-once" class="pill-button">Step</button>
+            </div>
+            <div class="control">
+              <button type="button" id="reset-sim" class="pill-button">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Rules</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Mode</span>
+                <select id="rule-mode" class="select-input">
+                  <option value="llr" selected>Life-Like (2D)</option>
+                  <option value="eca">Elementary (1D)</option>
+                </select>
+              </div>
+            </label>
+
+            <div class="rules-group" data-rule-mode="llr">
+              <label class="control">
+                <div class="control-row">
+                  <span>Rule</span>
+                  <select id="rule-preset" class="select-input">
+                    <option value="b3s23" selected>Conway (B3/S23)</option>
+                    <option value="b36s23">HighLife (B36/S23)</option>
+                    <option value="b2s">Seeds (B2/S)</option>
+                    <option value="b3678s34678">Day & Night (B3678/S34678)</option>
+                    <option value="morley">Morley (B368/S245)</option>
+                    <option value="twox2">2x2 (B36/S125)</option>
+                    <option value="diamoeba">Diamoeba (B35678/S5678)</option>
+                    <option value="anneal">Anneal (B4678/S35678)</option>
+                    <option value="replicator">Replicator (B1357/S1357)</option>
+                    <option value="lifewithoutdeath">Life Without Death (B3/S012345678)</option>
+                    <option value="coral">Coral (B3/S45678)</option>
+                    <option value="maze">Maze (B3/S12345)</option>
+                    <option value="mazectric">Mazectric (B3/S1234)</option>
+                    <option value="serviettes">Serviettes (B234/S)</option>
+                    <option value="coagulations">Coagulations (B378/S235678)</option>
+                    <option value="walledcities">Walled Cities (B45678/S2345)</option>
+                    <option value="assimilation">Assimilation (B345/S4567)</option>
+                    <option value="stains">Stains (B3678/S235678)</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+              </label>
+              <label class="control">
+                <div class="control-row">
+                  <span>Custom Rule</span>
+                  <span id="rule-value" class="mono-text">B3/S23</span>
+                </div>
+                <input type="text" id="rule-input" class="text-input" value="B3/S23" />
+              </label>
+              <label class="control">
+                <div class="control-row">
+                  <span>Neighbors</span>
+                  <select id="neighbor-mode" class="select-input">
+                    <option value="moore" selected>Moore (8)</option>
+                    <option value="vonneumann">Von Neumann (4)</option>
+                  </select>
+                </div>
+              </label>
+            </div>
+
+            <div class="rules-group is-hidden" data-rule-mode="eca">
+              <label class="control">
+                <div class="control-row">
+                  <span>Rule</span>
+                  <select id="eca-preset" class="select-input">
+                    <option value="rule30" selected>Rule 30</option>
+                    <option value="rule90">Rule 90</option>
+                    <option value="rule110">Rule 110</option>
+                    <option value="rule54">Rule 54</option>
+                    <option value="rule60">Rule 60</option>
+                    <option value="rule22">Rule 22</option>
+                    <option value="rule184">Rule 184</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+              </label>
+              <label class="control">
+                <div class="control-row">
+                  <span>Custom Rule</span>
+                  <span id="eca-rule-value">30</span>
+                </div>
+                <input type="range" id="eca-rule" min="0" max="255" step="1" value="30" />
+              </label>
+              <label class="control">
+                <div class="control-row">
+                  <span>Start</span>
+                  <select id="eca-start" class="select-input">
+                    <option value="single" selected>Row Y</option>
+                    <option value="random">Grid</option>
+                  </select>
+                </div>
+              </label>
+            </div>
+
+            <label class="control">
+              <div class="control-row">
+                <span>Wrap Edges</span>
+                <label class="switch">
+                  <input type="checkbox" id="wrap-toggle" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Grid</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Voxel Size</span>
+                <span id="voxel-size-value">0.14</span>
+              </div>
+              <input type="range" id="voxel-size" min="0.06" max="0.35" step="0.01" value="0.14" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Voxels X</span>
+                <span id="grid-x-value">22</span>
+              </div>
+              <input type="range" id="grid-x" min="8" max="64" step="1" value="22" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Voxels Y</span>
+                <span id="grid-z-value">22</span>
+              </div>
+              <input type="range" id="grid-z" min="8" max="64" step="1" value="22" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Density</span>
+                <span id="sim-density-value">0.35</span>
+              </div>
+              <input type="range" id="sim-density" min="0" max="1" step="0.01" value="0.35" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Seed</span>
+                <span id="sim-seed-value">42</span>
+              </div>
+              <input type="range" id="sim-seed" min="0" max="1000" step="1" value="42" />
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <button type="button" class="panel-heading" aria-expanded="true">
+            <span>Rendering</span>
+            <span class="panel-chevron">v</span>
+          </button>
+          <div class="panel-content">
+            <label class="control">
+              <div class="control-row">
+                <span>Top Color</span>
+                <span id="top-color-value" class="color-hex">#ad4500</span>
+              </div>
+              <div class="color-picker-row">
+                <button type="button" id="top-color-chip" aria-label="Pick top color"></button>
+                <input type="color" id="top-color" value="#ad4500" />
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Base Color</span>
+                <span id="base-color-value" class="color-hex">#4d52ff</span>
+              </div>
+              <div class="color-picker-row">
+                <button type="button" id="base-color-chip" aria-label="Pick base color"></button>
+                <input type="color" id="base-color" value="#4d52ff" />
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Bloom</span>
+                <span id="bloom-strength-value">0.10</span>
+              </div>
+              <input type="range" id="bloom-strength" min="0" max="2" step="0.05" value="0.1" />
+            </label>
+            <label class="control">
+              <div class="control-row">
+                <span>Emissive</span>
+                <span id="emissive-strength-value">0.00</span>
+              </div>
+              <input type="range" id="emissive-strength" min="0" max="2" step="0.05" value="0" />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="ui-handle-bottom"></div>
+    </div>
+  </div>
+</body>
+</html>
