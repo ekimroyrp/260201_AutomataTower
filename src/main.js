@@ -5,25 +5,28 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 const QUALITY_SCALE = 1.6;
 const FXAA_SCALE = 5.0;
 const MAX_INSTANCES = 350000;
+const BEVEL_RADIUS = 0.18;
+const BEVEL_SEGMENTS = 4;
 
 const settings = {
-  speed: 2,
+  speed: 8,
   density: 0.35,
   seed: 42,
   wrapEdges: true,
   neighborMode: 'moore',
   rule: 'B3/S23',
   voxelSize: 0.14,
-  gridX: 26,
-  gridZ: 26,
-  generations: 36,
+  gridX: 22,
+  gridZ: 22,
+  generations: 200,
   baseColor: '#ff6b4a',
   emissiveStrength: 0.55,
-  bloom: 0.18,
+  bloom: 0,
 };
 
 const rulePresets = {
@@ -63,8 +66,6 @@ renderer.toneMappingExposure = 1.05;
 app.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x03040a);
-scene.fog = new THREE.FogExp2(0x03040a, 0.08);
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60);
 camera.position.set(0, 0.15, 5.6);
@@ -109,7 +110,7 @@ const voxelGroup = new THREE.Group();
 scene.add(voxelGroup);
 
 const material = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(settings.baseColor),
+  color: new THREE.Color(0xffffff),
   roughness: 0.35,
   metalness: 0.05,
   emissive: new THREE.Color(settings.baseColor),
@@ -225,7 +226,7 @@ function buildVoxelMesh() {
   }
 
   instanceCapacity = settings.gridX * settings.gridZ * settings.generations;
-  voxelGeometry = new THREE.BoxGeometry(1, 1, 1);
+  voxelGeometry = new RoundedBoxGeometry(1, 1, 1, BEVEL_SEGMENTS, BEVEL_RADIUS);
   voxelMesh = new THREE.InstancedMesh(voxelGeometry, material, instanceCapacity);
   voxelMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   voxelMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(instanceCapacity * 3), 3);
@@ -252,6 +253,7 @@ function resetSimulation() {
   updateLayerColors();
   seedGrid();
   layers = [currentGrid.slice()];
+  stepAccumulator = 0;
   updateVoxelInstances();
 }
 
@@ -313,11 +315,11 @@ function updateVoxelInstances() {
     return;
   }
 
-  const scaleValue = settings.voxelSize * 0.92;
+  const scaleValue = settings.voxelSize;
   tempScale.set(scaleValue, scaleValue, scaleValue);
   const baseX = -(gridWidth - 1) * settings.voxelSize * 0.5;
   const baseZ = -(gridDepth - 1) * settings.voxelSize * 0.5;
-  const baseY = -((maxGenerations - 1) * settings.voxelSize) * 0.5;
+  const baseY = 0;
 
   let instanceIndex = 0;
 
@@ -350,14 +352,13 @@ function updateVoxelInstances() {
 }
 
 function updateMaterial() {
-  material.color.set(settings.baseColor);
   material.emissive.set(settings.baseColor);
   material.emissiveIntensity = settings.emissiveStrength;
   updateLayerColors();
   updateVoxelInstances();
 }
 
-let isPlaying = true;
+let isPlaying = false;
 let stepAccumulator = 0;
 let lastTime = performance.now();
 
@@ -487,10 +488,12 @@ bindRange('sim-speed', 'sim-speed-value', (v) => v.toFixed(2), (v) => {
 
 bindRange('sim-density', 'sim-density-value', (v) => v.toFixed(2), (v) => {
   settings.density = v;
+  resetSimulation();
 });
 
 bindRange('sim-seed', 'sim-seed-value', (v) => v.toFixed(0), (v) => {
   settings.seed = Math.round(v);
+  resetSimulation();
 });
 
 bindRange('voxel-size', 'voxel-size-value', (v) => v.toFixed(2), (v) => {
@@ -529,6 +532,8 @@ bindColor('base-color', 'base-color-value', 'base-color-chip', (value) => {
 });
 
 const playToggle = document.getElementById('play-toggle');
+playToggle.textContent = isPlaying ? 'Pause' : 'Play';
+playToggle.classList.toggle('is-paused', !isPlaying);
 playToggle.addEventListener('click', () => {
   isPlaying = !isPlaying;
   playToggle.textContent = isPlaying ? 'Pause' : 'Play';
